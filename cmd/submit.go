@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/aoccli/client"
+	"github.com/aoccli/helpers"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var submitCmd = &cobra.Command{
@@ -14,12 +14,13 @@ var submitCmd = &cobra.Command{
 	Short: "Submit the solution",
 	Long:  "Submit the solution to a problem. Will try to figure out what to submit.",
 	Run: func(cmd *cobra.Command, args []string) {
-		year := viper.GetInt("year")
-		day := viper.GetInt("day")
+		year := helpers.GetViperValueEnsureSet[int]("year")
+		day := helpers.GetViperValueEnsureSet[int]("day")
 
-		domain := viper.GetString("domain")
-		sessionToken := viper.GetString("session-token")
-		rootDir := viper.GetString("root-dir")
+		domain := helpers.GetViperValueEnsureSet[string]("domain")
+		sessionToken := helpers.GetViperValueEnsureSet[string]("session-token")
+		rootDir := helpers.GetViperValueEnsureSet[string]("root-dir")
+
 		aocClient, err := client.NewAOCClient(domain, sessionToken)
 		cobra.CheckErr(err)
 

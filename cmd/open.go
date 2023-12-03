@@ -5,7 +5,6 @@ import (
 
 	"github.com/aoccli/helpers"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var openCmd = &cobra.Command{
@@ -13,9 +12,9 @@ var openCmd = &cobra.Command{
 	Short: "Open the url for the specified day in a web browser",
 	Long:  "Opens the url for the specified day in a web browser using xdg-open",
 	Run: func(cmd *cobra.Command, args []string) {
-		year := viper.GetInt("year")
-		day := viper.GetInt("day")
-		domain := viper.GetString("domain")
+		year := helpers.GetViperValueEnsureSet[int]("year")
+		day := helpers.GetViperValueEnsureSet[int]("day")
+		domain := helpers.GetViperValueEnsureSet[string]("domain")
 
 		url := helpers.GetDayUrl(domain, year, day)
 		browserCmd := exec.Command("xdg-open", url)

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aoccli/helpers"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -41,7 +42,7 @@ var configureCmd = &cobra.Command{
 		saveIfStringChanged(cmd, "root-dir")
 		saveIfStringChanged(cmd, "python-venv")
 
-		day := viper.GetInt("day")
+		day := helpers.GetViperValueEnsureSet[int]("day")
 		currentTime := time.Now()
 
 		dayOfMonth := currentTime.Day()
@@ -59,12 +60,12 @@ var configureCmd = &cobra.Command{
 		}
 
 		fmt.Println("== Current Configuration ==")
-		fmt.Printf("Domain: %s\n", viper.GetString("domain"))
-		fmt.Printf("Year: %d\n", viper.GetInt("year"))
+		fmt.Printf("Domain: %s\n", helpers.GetViperValueEnsureSet[string]("domain"))
+		fmt.Printf("Year: %d\n", helpers.GetViperValueEnsureSet[int]("year"))
 		fmt.Printf("Day: %d\n", day)
-		fmt.Printf("Session token: %s\n", viper.GetString("session-token"))
-		fmt.Printf("Root directory: %s\n", viper.GetString("root-dir"))
-		fmt.Printf("Python virtualenv path: %s\n", viper.GetString("python-venv"))
+		fmt.Printf("Session token: %s\n", helpers.GetViperValueEnsureSet[string]("session-token"))
+		fmt.Printf("Root directory: %s\n", helpers.GetViperValueEnsureSet[string]("root-dir"))
+		fmt.Printf("Python virtualenv path: %s\n", helpers.GetViperValueEnsureSet[string]("python-venv"))
 
 		cobra.CheckErr(viper.WriteConfig())
 	},
@@ -73,12 +74,12 @@ var configureCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(configureCmd)
 
-	domain := viper.GetString("domain")
-	year := viper.GetInt("year")
-	day := viper.GetInt("day")
-	sessionToken := viper.GetString("session-token")
-	rootDir := viper.GetString("root-dir")
-	pythonVenv := viper.GetString("python-venv")
+	domain := helpers.GetViperValueEnsureSet[string]("domain")
+	year := helpers.GetViperValueEnsureSet[int]("year")
+	day := helpers.GetViperValueEnsureSet[int]("day")
+	sessionToken := helpers.GetViperValueEnsureSet[string]("session-token")
+	rootDir := helpers.GetViperValueEnsureSet[string]("root-dir")
+	pythonVenv := helpers.GetViperValueEnsureSet[string]("python-venv")
 
 	configureCmd.Flags().StringP("domain", "d", domain, "Domain of AOC")
 	configureCmd.Flags().IntP("year", "y", year, "Selected year")

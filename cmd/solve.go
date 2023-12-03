@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -17,11 +14,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// func solveProblem(pythonPath string, problemPath string) error {
-
-// }
-
-// solveCmd represents the solve command
 var solveCmd = &cobra.Command{
 	Use:   "solve",
 	Short: "Solve the specified day problem",
@@ -77,7 +69,7 @@ var solveCmd = &cobra.Command{
 				err = os.WriteFile(solutionPath, []byte(stderrStr), 0755)
 				cobra.CheckErr(err)
 			} else {
-				fmt.Println("Did not run on real input, not saving solution..\n")
+				fmt.Println("Did not run on real input, not saving solution..")
 			}
 		}
 	},
@@ -85,16 +77,6 @@ var solveCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(solveCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// solveCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// solveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	solveCmd.Flags().BoolP("test", "t", false, "Use test file as input instead of the real input")
 	solveCmd.Flags().BoolP("print", "p", false, "Just print run command instead of running")
 }

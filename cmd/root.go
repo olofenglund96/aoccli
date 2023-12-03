@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -14,24 +11,17 @@ import (
 )
 
 var (
-	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
 		Use:   "aoccli",
-		Short: "A brief description of your application",
-		Long: `A longer description that spans multiple lines and likely contains
-	examples and usage of using your application. For example:
+		Short: "An Advent of Code CLI",
+		Long: `A CLI tool to help you with Advent of Code. Can, for example,
+open the daily problem web page, scaffold a day, download input, submit etc..
+Uses the session cookie copied from the browser for authentication.
 
-	Cobra is a CLI library for Go that empowers applications.
-	This application is a tool to generate the needed files
-	to quickly create a Cobra application.`,
-		// Uncomment the following line if your bare application
-		// has an action associated with it:
-		// Run: func(cmd *cobra.Command, args []string) { },
+A good place to start would be to run 'configure' to set up configuration.`,
 	}
 )
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -42,23 +32,14 @@ func Execute() {
 
 func init() {
 	initConfig()
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.aoccli.yaml)")
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
 }
 
 func initConfig() {
-	// Find home directory.
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 
 	configPath := filepath.Join(home, "projects", "advent-of-code")
 
-	// Search config in home directory with name ".cobra" (without extension).
 	viper.AddConfigPath(configPath)
 	viper.SetConfigType("yaml")
 	viper.SetConfigName(".aoc")
@@ -71,7 +52,7 @@ func initConfig() {
 			fmt.Printf("Config file not found: %s..\n", err)
 			cobra.CheckErr(err)
 		} else {
-			fmt.Errorf("Unknown error occurred: %s\n", err)
+			fmt.Printf("Unknown error occurred: %s\n", err)
 			cobra.CheckErr(err)
 		}
 	}

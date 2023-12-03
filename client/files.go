@@ -39,7 +39,7 @@ func pathExists(path string) (bool, error) {
 
 func createFileIfNotExists(filePath string, contents []byte) error {
 	if exists, err := pathExists(filePath); err == nil && !exists {
-		fmt.Sprintf("File %s did not exist, creating..\n", filePath)
+		fmt.Printf("File %s did not exist, creating..\n", filePath)
 		os.WriteFile(filePath, contents, 0755)
 	} else {
 		return err
@@ -107,12 +107,3 @@ func (fc FileClient) SetProblemSolved(problem int) error {
 	solvedPath := filepath.Join(fc.dayPath, fmt.Sprintf("%d.solved", problem))
 	return os.Rename(solPath, solvedPath)
 }
-
-// func (fc FileClient) SolveProblem(year int, day int, problem int) error {
-// 	inputPath := filepath.Join(directory, "input")
-// 	if err := os.WriteFile(inputPath, contents, 0755); err != nil {
-// 		return fmt.Errorf("Something went wrong when writing input: %s", err)
-// 	}
-
-// 	return nil
-// }

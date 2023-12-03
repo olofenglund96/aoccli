@@ -101,12 +101,3 @@ func init() {
 	configureCmd.Flags().StringP("root-dir", "r", rootDir, "Root directory for the problems")
 	configureCmd.Flags().StringP("python-venv", "p", pythonVenv, "Path to the python virtual env")
 }
-
-// Mozarella
-// Ricotta
-// Citron
-// Lök
-// Tomatpure
-// Sardellpasta?
-// Vitvinsvinäger?
-// Finkrossade tomater?

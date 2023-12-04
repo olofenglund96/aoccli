@@ -7,7 +7,7 @@ import (
 )
 
 func GetViperValueEnsureSet[V any](key string) V {
-	if viper.IsSet(key) {
+	if !viper.IsSet(key) {
 		panic(fmt.Errorf("'%s' needs to be set by running 'configure'", key))
 	}
 

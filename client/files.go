@@ -38,11 +38,14 @@ func pathExists(path string) (bool, error) {
 }
 
 func createFileIfNotExists(filePath string, contents []byte) error {
-	if exists, err := pathExists(filePath); err == nil && !exists {
-		fmt.Printf("File %s did not exist, creating..\n", filePath)
-		os.WriteFile(filePath, contents, 0755)
-	} else {
+	exists, err := pathExists(filePath)
+	if err != nil {
 		return err
+	}
+
+	if !exists {
+		fmt.Printf("File %s did not exist, creating..\n", filePath)
+		return os.WriteFile(filePath, contents, 0755)
 	}
 
 	fmt.Printf("File %s already exists, not creating..\n", filePath)

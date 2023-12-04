@@ -35,14 +35,12 @@ func init() {
 }
 
 func initConfig() {
-	home, err := os.UserHomeDir()
-	cobra.CheckErr(err)
 
-	configPath := filepath.Join(home, "projects", "advent-of-code")
+	configPath := filepath.Join(".")
 
 	viper.AddConfigPath(configPath)
+	viper.SetConfigName(".config")
 	viper.SetConfigType("yaml")
-	viper.SetConfigName(".aoc")
 	viper.SafeWriteConfig()
 
 	viper.AutomaticEnv()

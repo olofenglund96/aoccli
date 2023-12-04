@@ -48,7 +48,7 @@ var configureCmd = &cobra.Command{
 		dayOfMonth := currentTime.Day()
 
 		if day != dayOfMonth {
-			fmt.Printf("Day in config '%d' is not today (%d), do you wish to update?(Y/n)\n", day, dayOfMonth)
+			fmt.Printf("Day in config '%d' is not today (%d), do you wish to change day to today? (Y/n)\n", day, dayOfMonth)
 			var choice string
 			fmt.Scanln(&choice)
 
@@ -58,7 +58,6 @@ var configureCmd = &cobra.Command{
 				viper.Set("day", day)
 			}
 		}
-
 		fmt.Println("== Current Configuration ==")
 		fmt.Printf("Domain: %s\n", helpers.GetViperValueEnsureSet[string]("domain"))
 		fmt.Printf("Year: %d\n", helpers.GetViperValueEnsureSet[int]("year"))

@@ -62,7 +62,6 @@ var submitCmd = &cobra.Command{
 				fmt.Printf("Solution \n'%s' to problem %d was not correct..\n", strings.TrimRight(solutionString, "\n"), i)
 				break
 			}
-
 			fmt.Printf("Solution '%s' to problem %d is correct!!\n", solutionString, i)
 			err = fileClient.SetProblemSolved(i)
 			cobra.CheckErr(err)

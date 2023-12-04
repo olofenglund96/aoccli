@@ -74,12 +74,12 @@ var configureCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(configureCmd)
 
-	domain := helpers.GetViperValueEnsureSet[string]("domain")
-	year := helpers.GetViperValueEnsureSet[int]("year")
-	day := helpers.GetViperValueEnsureSet[int]("day")
-	sessionToken := helpers.GetViperValueEnsureSet[string]("session-token")
-	rootDir := helpers.GetViperValueEnsureSet[string]("root-dir")
-	pythonVenv := helpers.GetViperValueEnsureSet[string]("python-venv")
+	domain := viper.GetString("domain")
+	year := viper.GetInt("year")
+	day := viper.GetInt("day")
+	sessionToken := viper.GetString("session-token")
+	rootDir := viper.GetString("root-dir")
+	pythonVenv := viper.GetString("python-venv")
 
 	configureCmd.Flags().StringP("domain", "d", domain, "Domain of AOC")
 	configureCmd.Flags().IntP("year", "y", year, "Selected year")

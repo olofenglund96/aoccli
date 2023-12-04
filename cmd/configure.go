@@ -40,7 +40,7 @@ var configureCmd = &cobra.Command{
 		saveIfIntChanged(cmd, "day")
 		saveIfStringChanged(cmd, "session-token")
 		saveIfStringChanged(cmd, "root-dir")
-		saveIfStringChanged(cmd, "python-venv")
+		saveIfStringChanged(cmd, "python-exec")
 
 		day := helpers.GetViperValueEnsureSet[int]("day")
 		currentTime := time.Now()
@@ -65,7 +65,7 @@ var configureCmd = &cobra.Command{
 		fmt.Printf("Day: %d\n", day)
 		fmt.Printf("Session token: %s\n", helpers.GetViperValueEnsureSet[string]("session-token"))
 		fmt.Printf("Root directory: %s\n", helpers.GetViperValueEnsureSet[string]("root-dir"))
-		fmt.Printf("Python virtualenv path: %s\n", helpers.GetViperValueEnsureSet[string]("python-venv"))
+		fmt.Printf("Python executable path: %s\n", helpers.GetViperValueEnsureSet[string]("python-exec"))
 
 		cobra.CheckErr(viper.WriteConfig())
 	},
@@ -79,12 +79,12 @@ func init() {
 	day := viper.GetInt("day")
 	sessionToken := viper.GetString("session-token")
 	rootDir := viper.GetString("root-dir")
-	pythonVenv := viper.GetString("python-venv")
+	pythonExecutable := viper.GetString("python-exec")
 
 	configureCmd.Flags().StringP("domain", "d", domain, "Domain of AOC")
 	configureCmd.Flags().IntP("year", "y", year, "Selected year")
 	configureCmd.Flags().Int("day", day, "Selected day")
 	configureCmd.Flags().StringP("session-token", "t", sessionToken, "Session token copied from AOC")
 	configureCmd.Flags().StringP("root-dir", "r", rootDir, "Root directory for the problems")
-	configureCmd.Flags().StringP("python-venv", "p", pythonVenv, "Path to the python virtual env")
+	configureCmd.Flags().StringP("python-exec", "p", pythonExecutable, "Path to the python executable")
 }

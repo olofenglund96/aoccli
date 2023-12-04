@@ -31,9 +31,8 @@ var solveCmd = &cobra.Command{
 
 		year := helpers.GetViperValueEnsureSet[int]("year")
 		day := helpers.GetViperValueEnsureSet[int]("day")
-		venv := helpers.GetViperValueEnsureSet[string]("python-venv")
+		pythonExecutable := helpers.GetViperValueEnsureSet[string]("python-exec")
 		rootDir := helpers.GetViperValueEnsureSet[string]("root-dir")
-		pythonExecutable := filepath.Join(venv, "bin", "python")
 
 		inputFile := "input"
 

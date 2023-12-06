@@ -21,16 +21,6 @@ func saveIfChanged(cmd *cobra.Command, cmdString string) {
 	}
 }
 
-func saveIfIntChanged(cmd *cobra.Command, cmdString string) {
-	if cmd.LocalFlags().Changed(cmdString) {
-		value, err := cmd.LocalFlags().GetInt(cmdString)
-		cobra.CheckErr(err)
-
-		viper.Set(cmdString, value)
-		fmt.Printf("Set %s to %d\n", cmdString, value)
-	}
-}
-
 var configureCmd = &cobra.Command{
 	Use:   "configure",
 	Short: "Configure the CLI",
@@ -54,7 +44,7 @@ var configureCmd = &cobra.Command{
 		day := helpers.GetViperValueEnsureSet("day")
 		currentTime := time.Now()
 
-		dayOfMonth := string(currentTime.Day())
+		dayOfMonth := strconv.Itoa(currentTime.Day())
 
 		if day != dayOfMonth {
 			fmt.Printf("Day in config '%s' is not today (%s), do you wish to change day to today? (Y/n)\n", day, dayOfMonth)
@@ -70,13 +60,24 @@ var configureCmd = &cobra.Command{
 		fmt.Println("== Current Configuration ==")
 		fmt.Printf("Domain: %s\n", helpers.GetViperValueEnsureSet("domain"))
 		fmt.Printf("Year: %s\n", helpers.GetViperValueEnsureSet("year"))
-		fmt.Printf("Day: %d\n", day)
+		fmt.Printf("Day: %s\n", day)
 		fmt.Printf("Session token: %s\n", helpers.GetViperValueEnsureSet("session-token"))
 		fmt.Printf("Root directory: %s\n", helpers.GetViperValueEnsureSet("root-dir"))
 		fmt.Printf("Python executable path: %s\n", helpers.GetViperValueEnsureSet("python-exec"))
 
 		cobra.CheckErr(viper.WriteConfig())
 	},
+}
+
+func parseInt(value string) int {
+	var err error
+	intValue := 0
+	if value != "" {
+		intValue, err = strconv.Atoi(value)
+		cobra.CheckErr(err)
+	}
+
+	return intValue
 }
 
 func init() {
@@ -87,12 +88,8 @@ func init() {
 	rootDir := viper.GetString("root-dir")
 	pythonExecutable := viper.GetString("python-exec")
 
-	yearStr := viper.GetString("year")
-	year, err := strconv.Atoi(yearStr)
-	cobra.CheckErr(err)
-	dayStr := viper.GetString("day")
-	day, err := strconv.Atoi(dayStr)
-	cobra.CheckErr(err)
+	year := parseInt(viper.GetString("year"))
+	day := parseInt(viper.GetString("day"))
 
 	configureCmd.Flags().StringP("domain", "d", domain, "Domain of AOC")
 	configureCmd.Flags().IntP("year", "y", year, "Selected year")

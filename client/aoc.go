@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -64,7 +65,7 @@ func (ac AOCClient) GetDayInput(year string, day string) (string, error) {
 
 func (ac AOCClient) SubmitProblem(year string, day string, problem int, solution string) (string, error) {
 	postBody := url.Values{
-		"level":  []string{string(problem)},
+		"level":  []string{strconv.Itoa(problem)},
 		"answer": []string{solution},
 	}
 	response, err := ac.httpClient.PostForm(helpers.GetDaySubmitUrl(ac.domain, year, day), postBody)

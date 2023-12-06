@@ -3,7 +3,7 @@ package helpers
 import "fmt"
 
 func GetDayUrl(domain string, year string, day string) string {
-	return fmt.Sprintf("https://%s/%d/day/%d", domain, year, day)
+	return fmt.Sprintf("https://%s/%s/day/%s", domain, year, day)
 }
 
 func GetDayInputUrl(domain string, year string, day string) string {

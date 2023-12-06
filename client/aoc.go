@@ -7,6 +7,9 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"strconv"
+	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 
 	"github.com/aoccli/helpers"
 )
@@ -79,4 +82,48 @@ func (ac AOCClient) SubmitProblem(year int, day int, problem int, solution strin
 	}
 
 	return string(body), nil
+}
+
+func (ac AOCClient) GetDayTestInput(year int, day int) (string, error) {
+	response, err := ac.httpClient.Get(helpers.GetDayUrl(ac.domain, year, day))
+	if err != nil {
+		fmt.Println("Error:", err)
+		return "", err
+	}
+	defer response.Body.Close()
+
+	return parseTestInput(response.Body)
+}
+
+func parseTestInput(responseBody io.ReadCloser) (string, error) {
+	doc, err := goquery.NewDocumentFromReader(responseBody)
+	if err != nil {
+		fmt.Println("Error parsing HTML:", err)
+		return "", err
+	}
+
+	dayDescription := doc.Find(".day-desc").First()
+
+	foundExampleText := false
+	var code string
+	dayDescription.Children().EachWithBreak(func(i int, s *goquery.Selection) bool {
+		selectorText := s.Text()
+		if foundExampleText && s.Is("pre") {
+			code = s.Find("code").First().Text()
+			return false
+		}
+
+		if strings.Contains(selectorText, "example") && strings.Index(selectorText, ":") == len(selectorText)-1 {
+			foundExampleText = true
+			return true
+		}
+
+		return true
+	})
+
+	if code == "" {
+		fmt.Println("Failed to find test input.. Please get it yourself 🥰")
+	}
+
+	return code, nil
 }

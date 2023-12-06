@@ -17,11 +17,10 @@ var submitCmd = &cobra.Command{
 		year := helpers.GetViperValueEnsureSet("year")
 		day := helpers.GetViperValueEnsureSet("day")
 
-		domain := helpers.GetViperValueEnsureSet("domain")
 		sessionToken := helpers.GetViperValueEnsureSet("session-token")
 		rootDir := helpers.GetViperValueEnsureSet("root-dir")
 
-		aocClient, err := client.NewAOCClient(domain, sessionToken)
+		aocClient, err := client.NewAOCClient(sessionToken)
 		cobra.CheckErr(err)
 
 		fileClient, err := client.NewFileClient(rootDir, year, day)

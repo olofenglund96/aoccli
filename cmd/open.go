@@ -14,9 +14,8 @@ var openCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		year := helpers.GetViperValueEnsureSet("year")
 		day := helpers.GetViperValueEnsureSet("day")
-		domain := helpers.GetViperValueEnsureSet("domain")
 
-		url := helpers.GetDayUrl(domain, year, day)
+		url := helpers.GetDayUrl("https://adventofcode.com", year, day)
 		browserCmd := exec.Command("xdg-open", url)
 		cobra.CheckErr(browserCmd.Run())
 	},

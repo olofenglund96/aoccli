@@ -76,7 +76,7 @@ func saveIfChanged(cmd *cobra.Command, cmdString string) {
 var configureCmd = &cobra.Command{
 	Use:   "configure",
 	Short: "Configure the CLI",
-	Long:  `Set the domain, year and session token to talk to AOC`,
+	Long:  `Set the year and session token to talk to AOC`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if cmd.Flags().NFlag() == 0 {
 			term := helpers.NewInteractiveTerminal(configKeys)
@@ -85,12 +85,12 @@ var configureCmd = &cobra.Command{
 			return
 		}
 
-		saveIfChanged(cmd, "domain")
 		saveIfChanged(cmd, "year")
 		saveIfChanged(cmd, "day")
 		saveIfChanged(cmd, "session-token")
 		saveIfChanged(cmd, "root-dir")
 		saveIfChanged(cmd, "python-exec")
+		saveIfChanged(cmd, "leaderboard")
 
 		day := helpers.GetViperValueEnsureSet("day")
 		currentTime := time.Now()
@@ -108,6 +108,7 @@ var configureCmd = &cobra.Command{
 				fmt.Printf("Day in config '%s' is already set to today (%s), not changing day..\n", day, dayOfMonth)
 			}
 		}
+
 		printConfigurationTable()
 		cobra.CheckErr(viper.WriteConfig())
 	},
@@ -127,19 +128,26 @@ func parseInt(value string) int {
 func init() {
 	rootCmd.AddCommand(configureCmd)
 
-	domain := viper.GetString("domain")
+	viper.SetDefault("year", time.Now().Local().Year())
+	viper.SetDefault("day", time.Now().Local().Day())
+	viper.SetDefault("session-token", "<enter aoc token here>")
+	viper.SetDefault("root-dir", "<enter root directory for problems>")
+	viper.SetDefault("python-exec", "<enter path for python executable>")
+	viper.SetDefault("leaderboard", "<enter private leaderboard id>")
+
 	sessionToken := viper.GetString("session-token")
 	rootDir := viper.GetString("root-dir")
 	pythonExecutable := viper.GetString("python-exec")
+	leaderboard := viper.GetString("leaderboard")
 
 	year := parseInt(viper.GetString("year"))
 	day := parseInt(viper.GetString("day"))
 
-	configureCmd.Flags().StringP("domain", "d", domain, "Domain of AOC")
 	configureCmd.Flags().IntP("year", "y", year, "Selected year")
 	configureCmd.Flags().Int("day", day, "Selected day")
 	configureCmd.Flags().StringP("session-token", "t", sessionToken, "Session token copied from AOC")
 	configureCmd.Flags().StringP("root-dir", "r", rootDir, "Root directory for the problems")
 	configureCmd.Flags().StringP("python-exec", "p", pythonExecutable, "Path to the python executable")
 	configureCmd.Flags().BoolP("refresh-day", "u", false, "Simply refresh the day")
+	configureCmd.Flags().StringP("leaderboard", "l", leaderboard, "Private leaderboard id")
 }

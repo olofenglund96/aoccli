@@ -27,7 +27,7 @@ var submitCmd = &cobra.Command{
 		fileClient, err := client.NewFileClient(rootDir, year, day)
 		cobra.CheckErr(err)
 
-		for i := 1; i <= 2; i++ {
+		for i := 2; i <= 2; i++ {
 			if problemSolved, err := fileClient.ProblemSolved(i); problemSolved && err == nil {
 				fmt.Printf("Problem %d is already solved and submitted, skipping..\n", i)
 				continue
@@ -44,19 +44,7 @@ var submitCmd = &cobra.Command{
 			response, err := aocClient.SubmitProblem(year, day, i, solutionString)
 			cobra.CheckErr(err)
 
-			if strings.Contains(response, "You gave an answer too recently") {
-				leftIx := strings.Index(response, " left to wait.")
-				startIx := -1
-				for j := leftIx; j > leftIx-20; j-- {
-					if response[j] == '.' {
-						startIx = j
-						break
-					}
-				}
-
-				fmt.Printf("Too many requests!! %s\n", response[startIx:leftIx+len(" left to wait.")])
-				break
-			}
+			fmt.Printf("== Got response: == \n\n%s\n\n==============\n", response)
 
 			if strings.Contains(response, "That's not the right answer") {
 				fmt.Printf("Solution \n'%s' to problem %d was not correct..\n", strings.TrimRight(solutionString, "\n"), i)

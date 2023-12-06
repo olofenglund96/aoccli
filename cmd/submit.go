@@ -27,7 +27,7 @@ var submitCmd = &cobra.Command{
 		fileClient, err := client.NewFileClient(rootDir, year, day)
 		cobra.CheckErr(err)
 
-		for i := 2; i <= 2; i++ {
+		for i := 1; i <= 2; i++ {
 			if problemSolved, err := fileClient.ProblemSolved(i); problemSolved && err == nil {
 				fmt.Printf("Problem %d is already solved and submitted, skipping..\n", i)
 				continue

@@ -63,11 +63,11 @@ func (fc FileClient) ScaffoldDay(year int, day int) error {
 
 	solFileStr := fmt.Sprintf(`import sys
 
-with open(f"%d/%d/{sys.argv[1]}", "r") as file:
+with open(f"%s/%d/%d/{sys.argv[1]}", "r") as file:
     lines = [l.strip() for l in file.readlines()]
 
 print(lines[-1], file=sys.stderr)
-`, year, day)
+`, fc.root, year, day)
 
 	if err := createFileIfNotExists(s1FilePath, []byte(solFileStr)); err != nil {
 		return err

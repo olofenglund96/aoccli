@@ -35,7 +35,6 @@ func init() {
 }
 
 func initConfig() {
-
 	configPath := filepath.Join(".")
 
 	viper.AddConfigPath(configPath)

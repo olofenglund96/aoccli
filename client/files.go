@@ -89,6 +89,15 @@ func (fc FileClient) WriteInput(contents []byte) error {
 	return nil
 }
 
+func (fc FileClient) WriteTestInput(contents []byte) error {
+	inputPath := filepath.Join(fc.dayPath, "test")
+	if err := os.WriteFile(inputPath, contents, 0755); err != nil {
+		return fmt.Errorf("Something went wrong when writing test input: %s", err)
+	}
+
+	return nil
+}
+
 func (fc FileClient) SolutionFileExists(problem int) (bool, error) {
 	solPath := filepath.Join(fc.dayPath, fmt.Sprintf("%d.sol", problem))
 	return pathExists(solPath)

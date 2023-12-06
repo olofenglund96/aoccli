@@ -24,11 +24,15 @@ var scaffoldCmd = &cobra.Command{
 
 		dayInput, err := aocClient.GetDayInput(year, day)
 		cobra.CheckErr(err)
+		dayTestInput, err := aocClient.GetDayTestInput(year, day)
+		cobra.CheckErr(err)
 
 		scaffolder, err := client.NewFileClient(rootDir, year, day)
 		cobra.CheckErr(err)
 		cobra.CheckErr(scaffolder.ScaffoldDay(year, day))
 		cobra.CheckErr(scaffolder.WriteInput([]byte(dayInput)))
+		cobra.CheckErr(scaffolder.WriteTestInput([]byte(dayTestInput)))
+
 		fmt.Printf("Successfully scaffolded year %d, day %d\n", year, day)
 	},
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func saveIfStringChanged(cmd *cobra.Command, cmdString string) {
+func saveIfChanged(cmd *cobra.Command, cmdString string) {
 	if cmd.LocalFlags().Changed(cmdString) {
 		value, err := cmd.LocalFlags().GetString(cmdString)
 		cobra.CheckErr(err)
@@ -35,36 +36,44 @@ var configureCmd = &cobra.Command{
 	Short: "Configure the CLI",
 	Long:  `Set the domain, year and session token to talk to AOC`,
 	Run: func(cmd *cobra.Command, args []string) {
-		saveIfStringChanged(cmd, "domain")
-		saveIfIntChanged(cmd, "year")
-		saveIfIntChanged(cmd, "day")
-		saveIfStringChanged(cmd, "session-token")
-		saveIfStringChanged(cmd, "root-dir")
-		saveIfStringChanged(cmd, "python-exec")
 
-		day := helpers.GetViperValueEnsureSet[int]("day")
+		if cmd.Flags().NFlag() == 0 {
+			term := helpers.NewInteractiveTerminal([]string{"domain", "year", "day", "session-token", "root-dir", "python-exec"})
+			err := term.Run()
+			cobra.CheckErr(err)
+			return
+		}
+
+		saveIfChanged(cmd, "domain")
+		saveIfChanged(cmd, "year")
+		saveIfChanged(cmd, "day")
+		saveIfChanged(cmd, "session-token")
+		saveIfChanged(cmd, "root-dir")
+		saveIfChanged(cmd, "python-exec")
+
+		day := helpers.GetViperValueEnsureSet("day")
 		currentTime := time.Now()
 
-		dayOfMonth := currentTime.Day()
+		dayOfMonth := string(currentTime.Day())
 
 		if day != dayOfMonth {
-			fmt.Printf("Day in config '%d' is not today (%d), do you wish to change day to today? (Y/n)\n", day, dayOfMonth)
+			fmt.Printf("Day in config '%s' is not today (%s), do you wish to change day to today? (Y/n)\n", day, dayOfMonth)
 			var choice string
 			fmt.Scanln(&choice)
 
 			if strings.Contains("yY", choice) {
-				fmt.Printf("Updating day to %d\n", dayOfMonth)
+				fmt.Printf("Updating day to %s\n", dayOfMonth)
 				day = dayOfMonth
 				viper.Set("day", day)
 			}
 		}
 		fmt.Println("== Current Configuration ==")
-		fmt.Printf("Domain: %s\n", helpers.GetViperValueEnsureSet[string]("domain"))
-		fmt.Printf("Year: %d\n", helpers.GetViperValueEnsureSet[int]("year"))
+		fmt.Printf("Domain: %s\n", helpers.GetViperValueEnsureSet("domain"))
+		fmt.Printf("Year: %s\n", helpers.GetViperValueEnsureSet("year"))
 		fmt.Printf("Day: %d\n", day)
-		fmt.Printf("Session token: %s\n", helpers.GetViperValueEnsureSet[string]("session-token"))
-		fmt.Printf("Root directory: %s\n", helpers.GetViperValueEnsureSet[string]("root-dir"))
-		fmt.Printf("Python executable path: %s\n", helpers.GetViperValueEnsureSet[string]("python-exec"))
+		fmt.Printf("Session token: %s\n", helpers.GetViperValueEnsureSet("session-token"))
+		fmt.Printf("Root directory: %s\n", helpers.GetViperValueEnsureSet("root-dir"))
+		fmt.Printf("Python executable path: %s\n", helpers.GetViperValueEnsureSet("python-exec"))
 
 		cobra.CheckErr(viper.WriteConfig())
 	},
@@ -74,11 +83,16 @@ func init() {
 	rootCmd.AddCommand(configureCmd)
 
 	domain := viper.GetString("domain")
-	year := viper.GetInt("year")
-	day := viper.GetInt("day")
 	sessionToken := viper.GetString("session-token")
 	rootDir := viper.GetString("root-dir")
 	pythonExecutable := viper.GetString("python-exec")
+
+	yearStr := viper.GetString("year")
+	year, err := strconv.Atoi(yearStr)
+	cobra.CheckErr(err)
+	dayStr := viper.GetString("day")
+	day, err := strconv.Atoi(dayStr)
+	cobra.CheckErr(err)
 
 	configureCmd.Flags().StringP("domain", "d", domain, "Domain of AOC")
 	configureCmd.Flags().IntP("year", "y", year, "Selected year")

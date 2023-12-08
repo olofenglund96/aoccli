@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 )
 
 type FileClient struct {
@@ -12,12 +11,12 @@ type FileClient struct {
 	dayPath string
 }
 
-func NewFileClient(rootDir string, year int, day int) (FileClient, error) {
+func NewFileClient(rootDir string, year string, day string) (FileClient, error) {
 	if _, err := os.Stat(rootDir); err != nil {
 		return FileClient{}, fmt.Errorf("Error when stating root directory: %s", err)
 	}
 
-	dayDirPath := filepath.Join(rootDir, strconv.Itoa(year), strconv.Itoa(day))
+	dayDirPath := filepath.Join(rootDir, year, day)
 
 	return FileClient{
 		root:    rootDir,
@@ -53,7 +52,7 @@ func createFileIfNotExists(filePath string, contents []byte) error {
 	return nil
 }
 
-func (fc FileClient) ScaffoldDay(year int, day int) error {
+func (fc FileClient) ScaffoldDay(year string, day string) error {
 	if err := os.MkdirAll(fc.dayPath, 0755); err != nil {
 		return err
 	}

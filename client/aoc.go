@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -46,7 +45,7 @@ func NewAOCClient(domain string, token string) (AOCClient, error) {
 	}, nil
 }
 
-func (ac AOCClient) GetDayInput(year int, day int) (string, error) {
+func (ac AOCClient) GetDayInput(year string, day string) (string, error) {
 	response, err := ac.httpClient.Get(helpers.GetDayInputUrl(ac.domain, year, day))
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -63,9 +62,9 @@ func (ac AOCClient) GetDayInput(year int, day int) (string, error) {
 	return string(body), nil
 }
 
-func (ac AOCClient) SubmitProblem(year int, day int, problem int, solution string) (string, error) {
+func (ac AOCClient) SubmitProblem(year string, day string, problem int, solution string) (string, error) {
 	postBody := url.Values{
-		"level":  []string{strconv.Itoa(problem)},
+		"level":  []string{string(problem)},
 		"answer": []string{solution},
 	}
 	response, err := ac.httpClient.PostForm(helpers.GetDaySubmitUrl(ac.domain, year, day), postBody)
@@ -84,7 +83,7 @@ func (ac AOCClient) SubmitProblem(year int, day int, problem int, solution strin
 	return doc.Find("article").First().Find("p").First().Text(), nil
 }
 
-func (ac AOCClient) GetDayTestInput(year int, day int) (string, error) {
+func (ac AOCClient) GetDayTestInput(year string, day string) (string, error) {
 	response, err := ac.httpClient.Get(helpers.GetDayUrl(ac.domain, year, day))
 	if err != nil {
 		fmt.Println("Error:", err)

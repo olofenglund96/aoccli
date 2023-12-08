@@ -14,12 +14,12 @@ var submitCmd = &cobra.Command{
 	Short: "Submit the solution",
 	Long:  "Submit the solution to a problem. Will try to figure out what to submit.",
 	Run: func(cmd *cobra.Command, args []string) {
-		year := helpers.GetViperValueEnsureSet[int]("year")
-		day := helpers.GetViperValueEnsureSet[int]("day")
+		year := helpers.GetViperValueEnsureSet("year")
+		day := helpers.GetViperValueEnsureSet("day")
 
-		domain := helpers.GetViperValueEnsureSet[string]("domain")
-		sessionToken := helpers.GetViperValueEnsureSet[string]("session-token")
-		rootDir := helpers.GetViperValueEnsureSet[string]("root-dir")
+		domain := helpers.GetViperValueEnsureSet("domain")
+		sessionToken := helpers.GetViperValueEnsureSet("session-token")
+		rootDir := helpers.GetViperValueEnsureSet("root-dir")
 
 		aocClient, err := client.NewAOCClient(domain, sessionToken)
 		cobra.CheckErr(err)

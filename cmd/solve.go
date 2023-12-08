@@ -29,10 +29,10 @@ var solveCmd = &cobra.Command{
 		printCommand, err := cmd.LocalFlags().GetBool("print")
 		cobra.CheckErr(err)
 
-		year := helpers.GetViperValueEnsureSet[int]("year")
-		day := helpers.GetViperValueEnsureSet[int]("day")
-		pythonExecutable := helpers.GetViperValueEnsureSet[string]("python-exec")
-		rootDir := helpers.GetViperValueEnsureSet[string]("root-dir")
+		year := helpers.GetViperValueEnsureSet("year")
+		day := helpers.GetViperValueEnsureSet("day")
+		pythonExecutable := helpers.GetViperValueEnsureSet("python-exec")
+		rootDir := helpers.GetViperValueEnsureSet("root-dir")
 
 		inputFile := "input"
 
@@ -40,8 +40,8 @@ var solveCmd = &cobra.Command{
 			inputFile = "test"
 		}
 
-		problemPath := filepath.Join(rootDir, strconv.Itoa(year), strconv.Itoa(day), fmt.Sprintf("s%d.py", problem))
-		solutionPath := filepath.Join(rootDir, strconv.Itoa(year), strconv.Itoa(day), fmt.Sprintf("%d.sol", problem))
+		problemPath := filepath.Join(rootDir, year, day, fmt.Sprintf("s%d.py", problem))
+		solutionPath := filepath.Join(rootDir, year, day, fmt.Sprintf("%d.sol", problem))
 
 		if printCommand {
 			fmt.Printf("Not running command, only printing..\n")

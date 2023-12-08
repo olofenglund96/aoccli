@@ -75,13 +75,13 @@ func (ac AOCClient) SubmitProblem(year int, day int, problem int, solution strin
 	}
 	defer response.Body.Close()
 
-	body, err := io.ReadAll(response.Body)
+	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
-		fmt.Println("Error reading response:", err)
+		fmt.Println("Error parsing HTML:", err)
 		return "", err
 	}
 
-	return string(body), nil
+	return doc.Find("article").First().Find("p").First().Text(), nil
 }
 
 func (ac AOCClient) GetDayTestInput(year int, day int) (string, error) {

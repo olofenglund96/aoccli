@@ -61,6 +61,7 @@ func (fc FileClient) ScaffoldDay(year string, day string) error {
 	s2FilePath := filepath.Join(fc.dayPath, "s2.py")
 
 	solFileStr := fmt.Sprintf(`import sys
+from pprint import pprint
 
 with open(f"%s/%s/{sys.argv[1]}", "r") as file:
     lines = [l.strip() for l in file.readlines()]

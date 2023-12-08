@@ -58,7 +58,6 @@ func (fc FileClient) ScaffoldDay(year string, day string) error {
 	}
 
 	s1FilePath := filepath.Join(fc.dayPath, "s1.py")
-	s2FilePath := filepath.Join(fc.dayPath, "s2.py")
 
 	solFileStr := fmt.Sprintf(`import sys
 from pprint import pprint
@@ -70,10 +69,6 @@ print(lines[-1], file=sys.stderr)
 `, year, day)
 
 	if err := createFileIfNotExists(s1FilePath, []byte(solFileStr)); err != nil {
-		return err
-	}
-
-	if err := createFileIfNotExists(s2FilePath, []byte(solFileStr)); err != nil {
 		return err
 	}
 
@@ -118,4 +113,17 @@ func (fc FileClient) SetProblemSolved(problem int) error {
 	solPath := filepath.Join(fc.dayPath, fmt.Sprintf("%d.sol", problem))
 	solvedPath := filepath.Join(fc.dayPath, fmt.Sprintf("%d.solved", problem))
 	return os.Rename(solPath, solvedPath)
+}
+
+func (fc FileClient) CreateSecondSolutionFile() error {
+	s1FilePath := filepath.Join(fc.dayPath, "s1.py")
+
+	s1FileContents, err := os.ReadFile(s1FilePath)
+	if err != nil {
+		return err
+	}
+
+	s2FilePath := filepath.Join(fc.dayPath, "s2.py")
+
+	return createFileIfNotExists(s2FilePath, s1FileContents)
 }

@@ -2,6 +2,6 @@
 
 (
     cd <cli parent folder>/aoccli
-    GOOS=<os> GOARCH=<architechture> go build -o aoccli
-    mv aoccli <bin path>
+    GOOS=<os> GOARCH=<architechture> go build -o aoc
+    mv aoc <bin path>
 )

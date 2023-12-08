@@ -33,7 +33,7 @@ var scaffoldCmd = &cobra.Command{
 		cobra.CheckErr(scaffolder.WriteInput([]byte(dayInput)))
 		cobra.CheckErr(scaffolder.WriteTestInput([]byte(dayTestInput)))
 
-		fmt.Printf("Successfully scaffolded year %d, day %d\n", year, day)
+		fmt.Printf("Successfully scaffolded year %s, day %s\n", year, day)
 	},
 }
 

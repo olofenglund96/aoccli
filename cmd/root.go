@@ -35,7 +35,13 @@ func init() {
 }
 
 func initConfig() {
-	configPath := filepath.Join(".")
+	home, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+
+	configPath := filepath.Join(home, ".aoccli")
+
+	err = os.MkdirAll(configPath, 0755)
+	cobra.CheckErr(err)
 
 	viper.AddConfigPath(configPath)
 	viper.SetConfigName(".config")

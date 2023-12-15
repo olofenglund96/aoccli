@@ -20,18 +20,18 @@ var scaffoldCmd = &cobra.Command{
 		rootDir := helpers.GetViperValueEnsureSet("root-dir")
 		aocClient, err := client.NewAOCClient(sessionToken)
 
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		dayInput, err := aocClient.GetDayInput(year, day)
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 		dayTestInput, err := aocClient.GetDayTestInput(year, day)
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		scaffolder, err := client.NewFileClient(rootDir, year, day)
-		cobra.CheckErr(err)
-		cobra.CheckErr(scaffolder.ScaffoldDay(year, day))
-		cobra.CheckErr(scaffolder.WriteInput([]byte(dayInput)))
-		cobra.CheckErr(scaffolder.WriteTestInput([]byte(dayTestInput)))
+		helpers.HandleErr(err)
+		helpers.HandleErr(scaffolder.ScaffoldDay(year, day))
+		helpers.HandleErr(scaffolder.WriteInput([]byte(dayInput)))
+		helpers.HandleErr(scaffolder.WriteTestInput([]byte(dayTestInput)))
 
 		fmt.Printf("Successfully scaffolded year %s, day %s\n", year, day)
 	},

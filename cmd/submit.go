@@ -21,10 +21,10 @@ var submitCmd = &cobra.Command{
 		rootDir := helpers.GetViperValueEnsureSet("root-dir")
 
 		aocClient, err := client.NewAOCClient(sessionToken)
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		fileClient, err := client.NewFileClient(rootDir, year, day)
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		for i := 1; i <= 2; i++ {
 			if problemSolved, err := fileClient.ProblemSolved(i); problemSolved && err == nil {
@@ -39,9 +39,9 @@ var submitCmd = &cobra.Command{
 
 			fmt.Printf("Problem %d solved but not submitted, submitting..\n", i)
 			solutionString, err := fileClient.ReadSolutionFile(i)
-			cobra.CheckErr(err)
+			helpers.HandleErr(err)
 			response, err := aocClient.SubmitProblem(year, day, i, solutionString)
-			cobra.CheckErr(err)
+			helpers.HandleErr(err)
 
 			fmt.Printf("== Got response: == \n\n%s\n\n==============\n", response)
 
@@ -51,9 +51,9 @@ var submitCmd = &cobra.Command{
 			}
 			fmt.Printf("Solution '%s' to problem %d is correct!!\n", solutionString, i)
 			err = fileClient.SetProblemSolved(i)
-			cobra.CheckErr(err)
+			helpers.HandleErr(err)
 			err = fileClient.CreateSecondSolutionFile()
-			cobra.CheckErr(err)
+			helpers.HandleErr(err)
 		}
 	},
 }

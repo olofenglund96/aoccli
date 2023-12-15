@@ -101,8 +101,7 @@ func (ac AOCClient) GetDayTestInput(year string, day string) (string, error) {
 func parseTestInput(responseBody io.ReadCloser) (string, error) {
 	doc, err := goquery.NewDocumentFromReader(responseBody)
 	if err != nil {
-		fmt.Println("Error parsing HTML:", err)
-		return "", err
+		return "", fmt.Errorf("error parsing HTML: %s", err)
 	}
 
 	dayDescription := doc.Find(".day-desc").First()
@@ -134,18 +133,20 @@ func parseTestInput(responseBody io.ReadCloser) (string, error) {
 func (ac AOCClient) GetLeaderboard(leaderboardId string) (LeaderboardResponse, error) {
 
 	response, err := ac.httpClient.Get(helpers.GetLeaderboardUrl(ac.domain, leaderboardId))
-
 	if err != nil {
-		fmt.Println("Error:", err)
-		return LeaderboardResponse{}, err
+		return LeaderboardResponse{}, fmt.Errorf("error when getting leadeboard: %s", err)
 	}
+
+	if response.StatusCode < 200 || response.StatusCode > 300 {
+		return LeaderboardResponse{}, fmt.Errorf("got status %d when fetching leader board.", response.StatusCode)
+	}
+
 	defer response.Body.Close()
 
 	var leaderboard LeaderboardResponse
 	err = json.NewDecoder(response.Body).Decode(&leaderboard)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return LeaderboardResponse{}, err
+		return LeaderboardResponse{}, fmt.Errorf("error when parsing leadeboard: %s", err)
 	}
 
 	return leaderboard, nil

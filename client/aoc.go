@@ -1,11 +1,13 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -19,8 +21,8 @@ type AOCClient struct {
 	httpClient *http.Client
 }
 
-func NewAOCClient(domain string, token string) (AOCClient, error) {
-	aocUrl := fmt.Sprintf("https://%s", domain)
+func NewAOCClient(token string) (AOCClient, error) {
+	aocUrl := "https://adventofcode.com"
 	cUrl, err := url.Parse(aocUrl)
 	if err != nil {
 		return AOCClient{}, err
@@ -39,7 +41,7 @@ func NewAOCClient(domain string, token string) (AOCClient, error) {
 	})
 
 	return AOCClient{
-		domain: domain,
+		domain: aocUrl,
 		httpClient: &http.Client{
 			Jar: jar,
 		},
@@ -86,6 +88,7 @@ func (ac AOCClient) SubmitProblem(year string, day string, problem int, solution
 
 func (ac AOCClient) GetDayTestInput(year string, day string) (string, error) {
 	response, err := ac.httpClient.Get(helpers.GetDayUrl(ac.domain, year, day))
+
 	if err != nil {
 		fmt.Println("Error:", err)
 		return "", err
@@ -126,4 +129,73 @@ func parseTestInput(responseBody io.ReadCloser) (string, error) {
 	}
 
 	return code, nil
+}
+
+func (ac AOCClient) GetLeaderboard(leaderboardId string) (LeaderboardResponse, error) {
+
+	response, err := ac.httpClient.Get(helpers.GetLeaderboardUrl(ac.domain, leaderboardId))
+
+	if err != nil {
+		fmt.Println("Error:", err)
+		return LeaderboardResponse{}, err
+	}
+	defer response.Body.Close()
+
+	var leaderboard LeaderboardResponse
+	err = json.NewDecoder(response.Body).Decode(&leaderboard)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return LeaderboardResponse{}, err
+	}
+
+	return leaderboard, nil
+}
+
+type (
+	LeaderboardResponse struct {
+		OwnerId   int               `json:"owner_id"`
+		Event     string            `json:"event"`
+		MemberMap map[string]Member `json:"members"`
+	}
+	Member struct {
+		Name               string                     `json:"name"`
+		Stars              int                        `json:"stars"`
+		LocalScore         int                        `json:"local_score"`
+		CompletionDayLevel map[string]CompletionLevel `json:"completion_day_level"`
+	}
+	CompletionLevel map[string]any
+)
+
+func (l LeaderboardResponse) String() string {
+
+	var members []Member
+	for _, m := range l.MemberMap {
+		members = append(members, m)
+	}
+	sort.Slice(members, func(i, j int) bool {
+		return members[i].LocalScore > members[j].LocalScore
+	})
+
+	s := "\t 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25\n"
+
+	pos := 1
+	for _, m := range members {
+		starString := ""
+		for i := 1; i <= 25; i++ {
+			if c, ok := m.CompletionDayLevel[strconv.Itoa(i)]; ok {
+				if len(c) == 1 {
+					starString = starString + " ☆ "
+				} else {
+					starString = starString + " ★ "
+				}
+
+			} else {
+				starString = starString + " - "
+			}
+		}
+		s = s + fmt.Sprintf("%d) %d\t%s \t %s (%d stars)\n", pos, m.LocalScore, starString, m.Name, m.Stars)
+		pos = pos + 1
+	}
+
+	return s
 }

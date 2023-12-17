@@ -24,10 +24,10 @@ var solveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		problem, err := strconv.Atoi(args[0])
 		useTest, err := cmd.LocalFlags().GetBool("test")
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		printCommand, err := cmd.LocalFlags().GetBool("print")
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		year := helpers.GetViperValueEnsureSet("year")
 		day := helpers.GetViperValueEnsureSet("day")
@@ -56,14 +56,14 @@ var solveCmd = &cobra.Command{
 
 		fmt.Printf("== Solving problem %d.. ==\n", problem)
 		err = command.Run()
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		stderrStr := buffer.String()
 		fmt.Printf("== Solved problem, got output: '%s' ==\n", strings.Replace(stderrStr, "\n", "", 1))
 		if !useTest {
 			fmt.Printf("Saving to file %s\n", solutionPath)
 			err = os.WriteFile(solutionPath, []byte(stderrStr), 0755)
-			cobra.CheckErr(err)
+			helpers.HandleErr(err)
 		} else {
 			fmt.Println("Did not run on real input, not saving solution..")
 		}

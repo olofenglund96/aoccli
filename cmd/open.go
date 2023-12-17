@@ -17,7 +17,7 @@ var openCmd = &cobra.Command{
 
 		url := helpers.GetDayUrl("https://adventofcode.com", year, day)
 		browserCmd := exec.Command("xdg-open", url)
-		cobra.CheckErr(browserCmd.Run())
+		helpers.HandleErr(browserCmd.Run())
 	},
 }
 

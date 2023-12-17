@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var configKeys = []string{"domain", "year", "day", "session-token", "root-dir", "python-exec"}
+var configKeys = []string{"year", "day", "session-token", "root-dir", "python-exec", "leaderboard"}
 
 const (
 	purple    = lipgloss.Color("99")
@@ -66,7 +66,7 @@ func printConfigurationTable() {
 func saveIfChanged(cmd *cobra.Command, cmdString string) {
 	if cmd.LocalFlags().Changed(cmdString) {
 		value, err := cmd.LocalFlags().GetString(cmdString)
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		viper.Set(cmdString, value)
 		fmt.Printf("Set %s to '%s'\n", cmdString, value)
@@ -81,23 +81,20 @@ var configureCmd = &cobra.Command{
 		if cmd.Flags().NFlag() == 0 {
 			term := helpers.NewInteractiveTerminal(configKeys)
 			err := term.Run()
-			cobra.CheckErr(err)
+			helpers.HandleErr(err)
 			return
 		}
 
-		saveIfChanged(cmd, "year")
-		saveIfChanged(cmd, "day")
-		saveIfChanged(cmd, "session-token")
-		saveIfChanged(cmd, "root-dir")
-		saveIfChanged(cmd, "python-exec")
-		saveIfChanged(cmd, "leaderboard")
+		for _, configKey := range configKeys {
+			saveIfChanged(cmd, configKey)
+		}
 
 		day := helpers.GetViperValueEnsureSet("day")
 		currentTime := time.Now()
 
 		dayOfMonth := strconv.Itoa(currentTime.Day())
 		rd, err := cmd.LocalFlags().GetBool("refresh-day")
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		if rd {
 			if day != dayOfMonth {
@@ -110,7 +107,7 @@ var configureCmd = &cobra.Command{
 		}
 
 		printConfigurationTable()
-		cobra.CheckErr(viper.WriteConfig())
+		helpers.HandleErr(viper.WriteConfig())
 	},
 }
 
@@ -119,7 +116,7 @@ func parseInt(value string) int {
 	intValue := 0
 	if value != "" {
 		intValue, err = strconv.Atoi(value)
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 	}
 
 	return intValue
@@ -130,10 +127,6 @@ func init() {
 
 	viper.SetDefault("year", time.Now().Local().Year())
 	viper.SetDefault("day", time.Now().Local().Day())
-	viper.SetDefault("session-token", "<enter aoc token here>")
-	viper.SetDefault("root-dir", "<enter root directory for problems>")
-	viper.SetDefault("python-exec", "<enter path for python executable>")
-	viper.SetDefault("leaderboard", "<enter private leaderboard id>")
 
 	sessionToken := viper.GetString("session-token")
 	rootDir := viper.GetString("root-dir")

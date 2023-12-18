@@ -12,13 +12,12 @@ var openCmd = &cobra.Command{
 	Short: "Open the url for the specified day in a web browser",
 	Long:  "Opens the url for the specified day in a web browser using xdg-open",
 	Run: func(cmd *cobra.Command, args []string) {
-		year := helpers.GetViperValueEnsureSet[int]("year")
-		day := helpers.GetViperValueEnsureSet[int]("day")
-		domain := helpers.GetViperValueEnsureSet[string]("domain")
+		year := helpers.GetViperValueEnsureSet("year")
+		day := helpers.GetViperValueEnsureSet("day")
 
-		url := helpers.GetDayUrl(domain, year, day)
+		url := helpers.GetDayUrl("https://adventofcode.com", year, day)
 		browserCmd := exec.Command("xdg-open", url)
-		cobra.CheckErr(browserCmd.Run())
+		helpers.HandleErr(browserCmd.Run())
 	},
 }
 

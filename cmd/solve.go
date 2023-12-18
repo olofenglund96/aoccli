@@ -24,15 +24,15 @@ var solveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		problem, err := strconv.Atoi(args[0])
 		useTest, err := cmd.LocalFlags().GetBool("test")
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		printCommand, err := cmd.LocalFlags().GetBool("print")
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
-		year := helpers.GetViperValueEnsureSet[int]("year")
-		day := helpers.GetViperValueEnsureSet[int]("day")
-		pythonExecutable := helpers.GetViperValueEnsureSet[string]("python-exec")
-		rootDir := helpers.GetViperValueEnsureSet[string]("root-dir")
+		year := helpers.GetViperValueEnsureSet("year")
+		day := helpers.GetViperValueEnsureSet("day")
+		pythonExecutable := helpers.GetViperValueEnsureSet("python-exec")
+		rootDir := helpers.GetViperValueEnsureSet("root-dir")
 
 		inputFile := "input"
 
@@ -40,8 +40,8 @@ var solveCmd = &cobra.Command{
 			inputFile = "test"
 		}
 
-		problemPath := filepath.Join(rootDir, strconv.Itoa(year), strconv.Itoa(day), fmt.Sprintf("s%d.py", problem))
-		solutionPath := filepath.Join(rootDir, strconv.Itoa(year), strconv.Itoa(day), fmt.Sprintf("%d.sol", problem))
+		problemPath := filepath.Join(rootDir, year, day, fmt.Sprintf("s%d.py", problem))
+		solutionPath := filepath.Join(rootDir, year, day, fmt.Sprintf("%d.sol", problem))
 
 		if printCommand {
 			fmt.Printf("Not running command, only printing..\n")
@@ -56,14 +56,14 @@ var solveCmd = &cobra.Command{
 
 		fmt.Printf("== Solving problem %d.. ==\n", problem)
 		err = command.Run()
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		stderrStr := buffer.String()
 		fmt.Printf("== Solved problem, got output: '%s' ==\n", strings.Replace(stderrStr, "\n", "", 1))
 		if !useTest {
 			fmt.Printf("Saving to file %s\n", solutionPath)
 			err = os.WriteFile(solutionPath, []byte(stderrStr), 0755)
-			cobra.CheckErr(err)
+			helpers.HandleErr(err)
 		} else {
 			fmt.Println("Did not run on real input, not saving solution..")
 		}

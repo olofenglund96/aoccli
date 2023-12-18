@@ -2,88 +2,145 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/aoccli/helpers"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-func saveIfStringChanged(cmd *cobra.Command, cmdString string) {
+var configKeys = []string{"year", "day", "session-token", "root-dir", "python-exec", "leaderboard"}
+
+const (
+	purple    = lipgloss.Color("99")
+	gray      = lipgloss.Color("245")
+	lightGray = lipgloss.Color("241")
+)
+
+func printConfigurationTable() {
+	fmt.Println("== Current Configuration ==")
+	re := lipgloss.NewRenderer(os.Stdout)
+
+	var (
+		// HeaderStyle is the lipgloss style used for the table headers.
+		HeaderStyle = re.NewStyle().Foreground(purple).Bold(true).Align(lipgloss.Center)
+		// CellStyle is the base lipgloss style used for the table rows.
+		CellStyle = re.NewStyle().Padding(0, 1)
+		// OddRowStyle is the lipgloss style used for odd-numbered table rows.
+		OddRowStyle = CellStyle.Copy().Foreground(gray)
+		// EvenRowStyle is the lipgloss style used for even-numbered table rows.
+		EvenRowStyle = CellStyle.Copy().Foreground(lightGray)
+		// BorderStyle is the lipgloss style used for the table border.
+		BorderStyle = lipgloss.NewStyle().Foreground(purple)
+	)
+
+	t := table.New().Border(lipgloss.ThickBorder()).
+		BorderStyle(BorderStyle).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			var style lipgloss.Style
+
+			switch {
+			case row == 0:
+				return HeaderStyle
+			case row%2 == 0:
+				style = EvenRowStyle
+			default:
+				style = OddRowStyle
+			}
+
+			return style
+		}).
+		Headers("Config", "Value")
+
+	for _, ck := range configKeys {
+		t.Row(ck, helpers.GetViperValueEnsureSet(ck))
+	}
+
+	fmt.Println(t)
+}
+
+func saveIfChanged(cmd *cobra.Command, cmdString string) {
 	if cmd.LocalFlags().Changed(cmdString) {
 		value, err := cmd.LocalFlags().GetString(cmdString)
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		viper.Set(cmdString, value)
 		fmt.Printf("Set %s to '%s'\n", cmdString, value)
 	}
 }
 
-func saveIfIntChanged(cmd *cobra.Command, cmdString string) {
-	if cmd.LocalFlags().Changed(cmdString) {
-		value, err := cmd.LocalFlags().GetInt(cmdString)
-		cobra.CheckErr(err)
-
-		viper.Set(cmdString, value)
-		fmt.Printf("Set %s to %d\n", cmdString, value)
-	}
-}
-
 var configureCmd = &cobra.Command{
 	Use:   "configure",
 	Short: "Configure the CLI",
-	Long:  `Set the domain, year and session token to talk to AOC`,
+	Long:  `Set the year and session token to talk to AOC`,
 	Run: func(cmd *cobra.Command, args []string) {
-		saveIfStringChanged(cmd, "domain")
-		saveIfIntChanged(cmd, "year")
-		saveIfIntChanged(cmd, "day")
-		saveIfStringChanged(cmd, "session-token")
-		saveIfStringChanged(cmd, "root-dir")
-		saveIfStringChanged(cmd, "python-exec")
+		if cmd.Flags().NFlag() == 0 {
+			term := helpers.NewInteractiveTerminal(configKeys)
+			err := term.Run()
+			helpers.HandleErr(err)
+			return
+		}
 
-		day := helpers.GetViperValueEnsureSet[int]("day")
+		for _, configKey := range configKeys {
+			saveIfChanged(cmd, configKey)
+		}
+
+		day := helpers.GetViperValueEnsureSet("day")
 		currentTime := time.Now()
 
-		dayOfMonth := currentTime.Day()
+		dayOfMonth := strconv.Itoa(currentTime.Day())
+		rd, err := cmd.LocalFlags().GetBool("refresh-day")
+		helpers.HandleErr(err)
 
-		if day != dayOfMonth {
-			fmt.Printf("Day in config '%d' is not today (%d), do you wish to change day to today? (Y/n)\n", day, dayOfMonth)
-			var choice string
-			fmt.Scanln(&choice)
-
-			if strings.Contains("yY", choice) {
-				fmt.Printf("Updating day to %d\n", dayOfMonth)
+		if rd {
+			if day != dayOfMonth {
+				fmt.Printf("Day in config '%s' is not today (%s), changing day to today\n", day, dayOfMonth)
 				day = dayOfMonth
 				viper.Set("day", day)
+			} else {
+				fmt.Printf("Day in config '%s' is already set to today (%s), not changing day..\n", day, dayOfMonth)
 			}
 		}
-		fmt.Println("== Current Configuration ==")
-		fmt.Printf("Domain: %s\n", helpers.GetViperValueEnsureSet[string]("domain"))
-		fmt.Printf("Year: %d\n", helpers.GetViperValueEnsureSet[int]("year"))
-		fmt.Printf("Day: %d\n", day)
-		fmt.Printf("Session token: %s\n", helpers.GetViperValueEnsureSet[string]("session-token"))
-		fmt.Printf("Root directory: %s\n", helpers.GetViperValueEnsureSet[string]("root-dir"))
-		fmt.Printf("Python executable path: %s\n", helpers.GetViperValueEnsureSet[string]("python-exec"))
 
-		cobra.CheckErr(viper.WriteConfig())
+		printConfigurationTable()
+		helpers.HandleErr(viper.WriteConfig())
 	},
+}
+
+func parseInt(value string) int {
+	var err error
+	intValue := 0
+	if value != "" {
+		intValue, err = strconv.Atoi(value)
+		helpers.HandleErr(err)
+	}
+
+	return intValue
 }
 
 func init() {
 	rootCmd.AddCommand(configureCmd)
 
-	domain := viper.GetString("domain")
-	year := viper.GetInt("year")
-	day := viper.GetInt("day")
+	viper.SetDefault("year", time.Now().Local().Year())
+	viper.SetDefault("day", time.Now().Local().Day())
+
 	sessionToken := viper.GetString("session-token")
 	rootDir := viper.GetString("root-dir")
 	pythonExecutable := viper.GetString("python-exec")
+	leaderboard := viper.GetString("leaderboard")
 
-	configureCmd.Flags().StringP("domain", "d", domain, "Domain of AOC")
+	year := parseInt(viper.GetString("year"))
+	day := parseInt(viper.GetString("day"))
+
 	configureCmd.Flags().IntP("year", "y", year, "Selected year")
 	configureCmd.Flags().Int("day", day, "Selected day")
 	configureCmd.Flags().StringP("session-token", "t", sessionToken, "Session token copied from AOC")
 	configureCmd.Flags().StringP("root-dir", "r", rootDir, "Root directory for the problems")
 	configureCmd.Flags().StringP("python-exec", "p", pythonExecutable, "Path to the python executable")
+	configureCmd.Flags().BoolP("refresh-day", "u", false, "Simply refresh the day")
+	configureCmd.Flags().StringP("leaderboard", "l", leaderboard, "Private leaderboard id")
 }

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/aoccli/helpers"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,7 +36,13 @@ func init() {
 }
 
 func initConfig() {
-	configPath := filepath.Join(".")
+	home, err := os.UserHomeDir()
+	helpers.HandleErr(err)
+
+	configPath := filepath.Join(home, ".aoccli")
+
+	err = os.MkdirAll(configPath, 0755)
+	helpers.HandleErr(err)
 
 	viper.AddConfigPath(configPath)
 	viper.SetConfigName(".config")
@@ -47,10 +54,10 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			fmt.Printf("Config file not found: %s..\n", err)
-			cobra.CheckErr(err)
+			helpers.HandleErr(err)
 		} else {
 			fmt.Printf("Unknown error occurred: %s\n", err)
-			cobra.CheckErr(err)
+			helpers.HandleErr(err)
 		}
 	}
 }

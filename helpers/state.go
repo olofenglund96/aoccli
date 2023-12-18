@@ -6,10 +6,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-func GetViperValueEnsureSet[V any](key string) V {
+func GetViperValueEnsureSet(key string) string {
 	if !viper.IsSet(key) {
 		panic(fmt.Errorf("'%s' needs to be set by running 'configure'", key))
 	}
 
-	return viper.Get(key).(V)
+	return viper.GetString(key)
 }

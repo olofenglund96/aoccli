@@ -13,27 +13,27 @@ var scaffoldCmd = &cobra.Command{
 	Short: "Scaffold a day",
 	Long:  `Scaffold all the files for a specific day`,
 	Run: func(cmd *cobra.Command, args []string) {
-		year := helpers.GetViperValueEnsureSet[int]("year")
-		day := helpers.GetViperValueEnsureSet[int]("day")
+		year := helpers.GetViperValueEnsureSet("year")
+		day := helpers.GetViperValueEnsureSet("day")
 
-		domain := helpers.GetViperValueEnsureSet[string]("domain")
-		sessionToken := helpers.GetViperValueEnsureSet[string]("session-token")
-		rootDir := helpers.GetViperValueEnsureSet[string]("root-dir")
-		aocClient, err := client.NewAOCClient(domain, sessionToken)
-		cobra.CheckErr(err)
+		sessionToken := helpers.GetViperValueEnsureSet("session-token")
+		rootDir := helpers.GetViperValueEnsureSet("root-dir")
+		aocClient, err := client.NewAOCClient(sessionToken)
+
+		helpers.HandleErr(err)
 
 		dayInput, err := aocClient.GetDayInput(year, day)
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 		dayTestInput, err := aocClient.GetDayTestInput(year, day)
-		cobra.CheckErr(err)
+		helpers.HandleErr(err)
 
 		scaffolder, err := client.NewFileClient(rootDir, year, day)
-		cobra.CheckErr(err)
-		cobra.CheckErr(scaffolder.ScaffoldDay(year, day))
-		cobra.CheckErr(scaffolder.WriteInput([]byte(dayInput)))
-		cobra.CheckErr(scaffolder.WriteTestInput([]byte(dayTestInput)))
+		helpers.HandleErr(err)
+		helpers.HandleErr(scaffolder.ScaffoldDay(year, day))
+		helpers.HandleErr(scaffolder.WriteInput([]byte(dayInput)))
+		helpers.HandleErr(scaffolder.WriteTestInput([]byte(dayTestInput)))
 
-		fmt.Printf("Successfully scaffolded year %d, day %d\n", year, day)
+		fmt.Printf("Successfully scaffolded year %s, day %s\n", year, day)
 	},
 }
 

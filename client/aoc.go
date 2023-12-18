@@ -17,7 +17,7 @@ import (
 )
 
 type AOCClient struct {
-	domain     string
+	url        string
 	httpClient *http.Client
 }
 
@@ -41,7 +41,7 @@ func NewAOCClient(token string) (AOCClient, error) {
 	})
 
 	return AOCClient{
-		domain: aocUrl,
+		url: aocUrl,
 		httpClient: &http.Client{
 			Jar: jar,
 		},
@@ -49,7 +49,7 @@ func NewAOCClient(token string) (AOCClient, error) {
 }
 
 func (ac AOCClient) GetDayInput(year string, day string) (string, error) {
-	response, err := ac.httpClient.Get(helpers.GetDayInputUrl(ac.domain, year, day))
+	response, err := ac.httpClient.Get(helpers.GetDayInputUrl(ac.url, year, day))
 	if err != nil {
 		fmt.Println("Error:", err)
 		return "", err
@@ -70,7 +70,7 @@ func (ac AOCClient) SubmitProblem(year string, day string, problem int, solution
 		"level":  []string{strconv.Itoa(problem)},
 		"answer": []string{solution},
 	}
-	response, err := ac.httpClient.PostForm(helpers.GetDaySubmitUrl(ac.domain, year, day), postBody)
+	response, err := ac.httpClient.PostForm(helpers.GetDaySubmitUrl(ac.url, year, day), postBody)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return "", err
@@ -87,7 +87,7 @@ func (ac AOCClient) SubmitProblem(year string, day string, problem int, solution
 }
 
 func (ac AOCClient) GetDayTestInput(year string, day string) (string, error) {
-	response, err := ac.httpClient.Get(helpers.GetDayUrl(ac.domain, year, day))
+	response, err := ac.httpClient.Get(helpers.GetDayUrl(ac.url, year, day))
 
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -132,7 +132,7 @@ func parseTestInput(responseBody io.ReadCloser) (string, error) {
 
 func (ac AOCClient) GetLeaderboard(leaderboardId string) (LeaderboardResponse, error) {
 
-	response, err := ac.httpClient.Get(helpers.GetLeaderboardUrl(ac.domain, leaderboardId))
+	response, err := ac.httpClient.Get(helpers.GetLeaderboardUrl(ac.url, leaderboardId))
 	if err != nil {
 		return LeaderboardResponse{}, fmt.Errorf("error when getting leadeboard: %s", err)
 	}

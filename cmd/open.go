@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os/exec"
+	"strings"
 
 	"github.com/aoccli/helpers"
 	"github.com/spf13/cobra"
@@ -16,9 +17,28 @@ var openCmd = &cobra.Command{
 		day := helpers.GetViperValueEnsureSet("day")
 
 		url := helpers.GetDayUrl("https://adventofcode.com", year, day)
-		browserCmd := exec.Command("xdg-open", url)
-		helpers.HandleErr(browserCmd.Run())
+		helpers.HandleErr(openBrowser(url))
 	},
+}
+
+func openBrowser(url string) error {
+	unameOutput, err := exec.Command("uname", "-s").Output()
+	if err != nil {
+		return err
+	}
+
+	println(unameOutput)
+	println(string(unameOutput))
+
+	openExecutable := "xgd-open"
+	if strings.Contains(string(unameOutput), "Darwin") {
+		openExecutable = "open"
+	}
+
+	println(openExecutable)
+
+	browserCmd := exec.Command(openExecutable, url)
+	return browserCmd.Run()
 }
 
 func init() {

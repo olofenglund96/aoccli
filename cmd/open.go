@@ -27,15 +27,10 @@ func openBrowser(url string) error {
 		return err
 	}
 
-	println(unameOutput)
-	println(string(unameOutput))
-
 	openExecutable := "xgd-open"
 	if strings.Contains(string(unameOutput), "Darwin") {
 		openExecutable = "open"
 	}
-
-	println(openExecutable)
 
 	browserCmd := exec.Command(openExecutable, url)
 	return browserCmd.Run()

@@ -72,6 +72,20 @@ print(lines[-1], file=sys.stderr)
 		return err
 	}
 
+
+	gitignorePath := filepath.Join(fc.root, year)
+
+	gitignoreStr := `*
+
+!/*
+!/*/*.py
+!.gitignore
+`
+
+	if err := createFileIfNotExists(gitignorePath, []byte(gitignoreStr)); err != nil {
+		return err
+	}
+
 	return nil
 }
 

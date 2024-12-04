@@ -36,20 +36,19 @@ func pathExists(path string) (bool, error) {
 	return true, nil
 }
 
-func createFileIfNotExists(filePath string, contents []byte) error {
+func createFileIfNotExists(filePath string, contents []byte) (bool, error) {
 	exists, err := pathExists(filePath)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	if !exists {
-		fmt.Printf("File %s did not exist, creating..\n", filePath)
-		return os.WriteFile(filePath, contents, 0755)
+	if exists {
+		fmt.Printf("File %s already exists, not creating..\n", filePath)
+		return true, nil
 	}
 
-	fmt.Printf("File %s already exists, not creating..\n", filePath)
-
-	return nil
+	fmt.Printf("File %s did not exist, creating..\n", filePath)
+	return false, os.WriteFile(filePath, contents, 0755)
 }
 
 func (fc FileClient) ScaffoldDay(year string, day string) error {
@@ -68,7 +67,7 @@ with open(f"%s/%s/%s/{sys.argv[1]}", "r") as file:
 print(lines[-1], file=sys.stderr)
 `, fc.root, year, day)
 
-	if err := createFileIfNotExists(s1FilePath, []byte(solFileStr)); err != nil {
+	if _, err := createFileIfNotExists(s1FilePath, []byte(solFileStr)); err != nil {
 		return err
 	}
 
@@ -82,7 +81,7 @@ print(lines[-1], file=sys.stderr)
 !.gitignore
 `
 
-	if err := createFileIfNotExists(gitignorePath, []byte(gitignoreStr)); err != nil {
+	if _, err := createFileIfNotExists(gitignorePath, []byte(gitignoreStr)); err != nil {
 		return err
 	}
 
@@ -129,12 +128,12 @@ func (fc FileClient) SetProblemSolved(problem int) error {
 	return os.Rename(solPath, solvedPath)
 }
 
-func (fc FileClient) CreateSecondSolutionFile() error {
+func (fc FileClient) CreateSecondSolutionFile() (bool, error) {
 	s1FilePath := filepath.Join(fc.dayPath, "s1.py")
 
 	s1FileContents, err := os.ReadFile(s1FilePath)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	s2FilePath := filepath.Join(fc.dayPath, "s2.py")

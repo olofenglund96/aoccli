@@ -13,7 +13,7 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:   "aoccli",
+		Use:   "aoc",
 		Short: "An Advent of Code CLI",
 		Long: `A CLI tool to help you with Advent of Code. Can, for example,
 open the daily problem web page, scaffold a day, download input, submit etc..

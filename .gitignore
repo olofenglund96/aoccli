@@ -7,3 +7,6 @@ build
 
 out
 tmp
+
+__pycache__
+*.egg-info/

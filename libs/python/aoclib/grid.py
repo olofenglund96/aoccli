@@ -9,6 +9,14 @@ def convert_lines_into_grid(lines, dtype=str, split_fun=list):
 
     return grid
 
+def index_symbols_in_grid(grid):
+    unique_symbols = np.unique(grid)
+    symbol_map = {}
+    for sym in unique_symbols:
+        symbol_map[sym] = np.argwhere(grid == sym)
+
+    return symbol_map
+
 def get_adjacent_elements(grid, x, y, depth=1, geometry="euclidean"):
     if geometry != "euclidean":
         raise Exception(f"geometry '{geometry}' not supported")

@@ -54,6 +54,11 @@ func (s submitter) submitSubProblem(problemIndex int) (bool, error) {
 		return false, nil
 	}
 
+	if strings.Contains(response, "You gave an answer too recently") {
+		fmt.Printf("Solution \n'%s' to problem %d could not be submitted yet. Wait a couple of minutes..make\n", strings.TrimRight(solutionString, "\n"), problemIndex)
+		return false, nil
+	}
+
 	fmt.Printf("Solution '%s' to problem %d is correct!!\n", solutionString, problemIndex)
 	err = s.fileClient.SetProblemSolved(problemIndex)
 	if err != nil {
